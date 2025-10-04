@@ -12,6 +12,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.ensemble import GradientBoostingClassifier
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import classification_report, roc_auc_score, confusion_matrix
+
 # ---------------------------------------------------------------------
 # Default data path
 # ---------------------------------------------------------------------
@@ -104,10 +108,7 @@ def train_model(
 
 
 if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-    from sklearn.metrics import classification_report, roc_auc_score, confusion_matrix
-
+    
     # Load & clean
     df = load_data()
     print("Shape:", df.shape)
