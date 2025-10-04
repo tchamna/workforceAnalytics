@@ -41,7 +41,7 @@ dist/
 Thumbs.db
 
 # Data files (if large or sensitive)
-data/
+# data/
 *.csv
 *.gz
 *.zip
@@ -56,3 +56,5 @@ data/
 *.h5
 *.pt
 *.onnx
+!data/WA_Fn-UseC_-HR-Employee-Attrition.csv
+
