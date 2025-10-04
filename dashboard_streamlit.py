@@ -121,15 +121,17 @@ def train_best_model(df: pd.DataFrame):
 
     st.success(f"✅ Best model: {best_name} (F1={best_score:.3f})")
 
+    # build feature names after encoding
+    feature_names = num_cols + list(preprocessor.named_transformers_['cat'].get_feature_names_out(cat_cols))
+
     import pickle
     with open(MODEL_PATH, "wb") as f:
         pickle.dump({"model": best_model,
                      "preprocessor": preprocessor,
-                     "feature_names": num_cols
-                       + list(preprocessor.named_transformers_['cat'].get_feature_names_out(cat_cols))},
+                     "feature_names": feature_names},
                     f)
 
-    return best_model, preprocessor, X_test_p, y_test
+    return best_model, preprocessor, X_test_p, y_test, feature_names
 
 # ---------------------------------------------------------------------
 # Sidebar
@@ -194,8 +196,7 @@ if MODEL_PATH.exists():
     X_test_p = preprocessor.transform(X_test)
 else:
     st.info("No model.pkl found — training best model now…")
-    model, preprocessor, X_test_p, y_test = train_best_model(df)
-    feature_names = getattr(model, "feature_names_in_", None)
+    model, preprocessor, X_test_p, y_test, feature_names = train_best_model(df)
 
 y_prob = model.predict_proba(X_test_p)[:,1]
 threshold = st.sidebar.slider("Decision threshold", 0.0, 1.0, 0.5, 0.01)
@@ -282,7 +283,7 @@ if show_shap:
             sample = X_test_p[:min(200, X_test_p.shape[0])]
             shap_values = explainer(sample)
             plt.figure(figsize=(10,5))
-            shap.summary_plot(shap_values, sample, show=False)
+            shap.summary_plot(shap_values, sample, feature_names=feature_names, show=False)
             st.pyplot(plt.gcf())
             plt.clf()
         except Exception as e:
