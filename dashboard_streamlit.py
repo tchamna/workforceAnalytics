@@ -127,19 +127,61 @@ def plot_feature_importance(model, feature_names, top_n=15):
 # ---------------------------------------------------------------------
 # ---------------------------------------------------------------------
 # Sidebar controls (centered logo + title)
+# # ---------------------------------------------------------------------
+# with st.sidebar:
+#     col_empty_left, col_center, col_empty_right = st.columns([1, 3, 1])
+#     with col_center:
+#         st.image("data/resulam_logo_egg.png", width=100)
+
+#     st.markdown(
+#         "<h2 style='text-align: center; margin-top: 0px;'>⚙️ Controls</h2>",
+#         unsafe_allow_html=True
+#     )
+
+#     uploaded = st.file_uploader("Upload CSV (optional)", type=["csv"])
+#     # show_shap = st.toggle("Show SHAP (advanced)")
+#     show_shap = st.toggle("Show SHAP (advanced)", value=True)
+
+#     retrain = st.button("🔄 Retrain model")
+#     st.markdown("---")
+#     st.caption("Upload new data, toggle SHAP explanations, or retrain the model.")
+
+#     # ---- Author info card ----
+#     st.markdown(
+#         """
+#         <hr style="margin-top:20px; margin-bottom:10px;">
+#         <div style="
+#             text-align: center;
+#             font-size: 13px;
+#             line-height: 1.4;
+#             color: #444;
+#         ">
+#             <b>Author:</b> Shck Tchamna<br>
+#             Founder @ <a href="https://www.resulam.com" target="_blank" style="color:#2b8cbe;text-decoration:none;">Resulam</a><br>
+#             Data Scientist | Developer<br>
+#             <a href="mailto:tchamna@gmail.com" style="color:#2b8cbe;text-decoration:none;">tchamna@gmail.com</a>
+#         </div>
+#         """,
+#         unsafe_allow_html=True
+#     )
+
+# ---------------------------------------------------------------------
+# Sidebar controls (true centered logo, works on mobile)
 # ---------------------------------------------------------------------
 with st.sidebar:
-    col_empty_left, col_center, col_empty_right = st.columns([1, 3, 1])
-    with col_center:
+    # Create three columns and put the image in the middle
+    c1, c2, c3 = st.columns([1, 4, 1])
+    with c2:
         st.image("data/resulam_logo_egg.png", width=100)
 
+    # Center the header
     st.markdown(
-        "<h2 style='text-align: center; margin-top: 0px;'>⚙️ Controls</h2>",
+        "<h2 style='text-align: center; margin-top: 0;'>⚙️ Controls</h2>",
         unsafe_allow_html=True
     )
 
     uploaded = st.file_uploader("Upload CSV (optional)", type=["csv"])
-    show_shap = st.toggle("Show SHAP (advanced)")
+    show_shap = st.toggle("Show SHAP (advanced)", value=True)
     retrain = st.button("🔄 Retrain model")
     st.markdown("---")
     st.caption("Upload new data, toggle SHAP explanations, or retrain the model.")
@@ -175,7 +217,7 @@ else:
     raw = load_data()
 
 st.subheader("📊 Dataset Sample")
-st.dataframe(raw.head(10))
+st.dataframe(raw.head(5))
 
 df = preprocess(raw)
 
