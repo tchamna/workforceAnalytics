@@ -64,7 +64,6 @@ def load_data(path=DATA_PATH):
 
 @st.cache_data
 def clean_data(df: pd.DataFrame):
-    """Clean but keep categorical columns intact for model pipeline."""
     df = df.copy()
     df["Attrition"] = df["Attrition"].map({"Yes": 1, "No": 0})
     df.drop(["EmployeeNumber", "EmployeeCount", "StandardHours", "Over18"], axis=1, errors="ignore", inplace=True)
@@ -72,7 +71,6 @@ def clean_data(df: pd.DataFrame):
 
 @st.cache_data
 def train_best_model(df: pd.DataFrame):
-    """Train & pick best model based on F1 for attrition class."""
     X = df.drop("Attrition", axis=1)
     y = df["Attrition"]
 
@@ -121,7 +119,6 @@ def train_best_model(df: pd.DataFrame):
 
     st.success(f"✅ Best model: {best_name} (F1={best_score:.3f})")
 
-    # build feature names after encoding
     feature_names = num_cols + list(preprocessor.named_transformers_['cat'].get_feature_names_out(cat_cols))
 
     import pickle
@@ -250,21 +247,57 @@ styled = (
 with col_right:
     st.dataframe(styled, use_container_width=True)
 
-# ---- Explanation card
-acc = report_dict["accuracy"]
-p0, r0, f10 = report_dict["0"]["precision"], report_dict["0"]["recall"], report_dict["0"]["f1-score"]
-p1, r1, f11 = report_dict["1"]["precision"], report_dict["1"]["recall"], report_dict["1"]["f1-score"]
-mp, mr, mf = report_dict.get("macro avg",{}).get("precision",0), report_dict.get("macro avg",{}).get("recall",0), report_dict.get("macro avg",{}).get("f1-score",0)
-wp, wr, wf = report_dict["weighted avg"]["precision"], report_dict["weighted avg"]["recall"], report_dict["weighted avg"]["f1-score"]
+# ---- Detailed explanation (your old style)
+accuracy = report_dict["accuracy"]
+precision_0 = report_dict["0"]["precision"]
+recall_0 = report_dict["0"]["recall"]
+f1_0 = report_dict["0"]["f1-score"]
+support_0 = report_dict["0"]["support"]
+
+precision_1 = report_dict["1"]["precision"]
+recall_1 = report_dict["1"]["recall"]
+f1_1 = report_dict["1"]["f1-score"]
+support_1 = report_dict["1"]["support"]
+
+macro_precision = report_dict.get("macro avg",{}).get("precision",0)
+macro_recall = report_dict.get("macro avg",{}).get("recall",0)
+macro_f1 = report_dict.get("macro avg",{}).get("f1-score",0)
+
+weighted_precision = report_dict["weighted avg"]["precision"]
+weighted_recall = report_dict["weighted avg"]["recall"]
+weighted_f1 = report_dict["weighted avg"]["f1-score"]
 
 st.markdown(
     f"""
-    <div style="background-color:#E6EEF5;padding:15px;border-radius:8px;margin-top:10px;line-height:1.6;">
-    • <b>Accuracy:</b> {acc:.0%} overall.<br><br>
-    • <b>Class 0 (Stayed):</b> recall {r0:.0%}, precision {p0:.0%}, F1 {f10:.2f}.<br>
-    • <b>Class 1 (Left):</b> recall {r1:.0%}, precision {p1:.0%}, F1 {f11:.2f}.<br><br>
-    • <b>Macro avg:</b> P {mp:.2f}, R {mr:.2f}, F1 {mf:.2f}.<br>
-    • <b>Weighted avg:</b> P {wp:.2f}, R {wr:.2f}, F1 {wf:.2f}.
+    <div style="
+        background-color:#E6EEF5;
+        padding:15px;
+        border-radius:8px;
+        margin-top:10px;
+        line-height:1.6;
+    ">
+    <b>📊 Understanding the results on your test set:</b><br><br>
+
+    • <b>Accuracy:</b> The model correctly predicted attrition status for
+      <b>{accuracy:.0%}</b> of all {int(support_0 + support_1)} employees.<br><br>
+
+    • <b>Class 0 (Stayed):</b> Out of {int(support_0)} employees who stayed, the model
+      correctly identified <b>{recall_0:.0%}</b> of them (recall) and when it predicted
+      someone would stay, it was correct <b>{precision_0:.0%}</b> of the time (precision).
+      Combined, this gives an F1-score of <b>{f1_0:.2f}</b>.<br><br>
+
+    • <b>Class 1 (Left):</b> Out of {int(support_1)} employees who actually left, the model
+      correctly caught <b>{recall_1:.0%}</b> of them (recall) and when it predicted someone
+      would leave, it was correct <b>{precision_1:.0%}</b> of the time (precision).
+      F1-score for leavers is <b>{f1_1:.2f}</b>.<br><br>
+
+    • <b>Macro avg:</b> Averaging each class equally (regardless of how many samples there are)
+      gives Precision <b>{macro_precision:.2f}</b>, Recall <b>{macro_recall:.2f}</b>, and
+      F1-score <b>{macro_f1:.2f}</b>.<br>
+
+    • <b>Weighted avg:</b> Taking into account that most employees stayed (class imbalance),
+      the overall weighted Precision is <b>{weighted_precision:.2f}</b>, Recall
+      <b>{weighted_recall:.2f}</b>, and F1-score <b>{weighted_f1:.2f}</b>.
     </div>
     """,
     unsafe_allow_html=True
@@ -277,7 +310,7 @@ if show_shap:
     if shap is None:
         st.warning("SHAP not installed. Install `shap` to enable interactive explanations.")
     else:
-        st.subheader("🔍 SHAP Summary Plot")
+        st.subheader("🔍 Attrition SHAP Summary Plot")
         try:
             explainer = shap.Explainer(model, X_test_p)
             sample = X_test_p[:min(200, X_test_p.shape[0])]
