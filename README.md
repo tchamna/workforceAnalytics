@@ -24,6 +24,8 @@ python scripts/train_model.py
 # This creates model.pkl in the repo root
 ```
 
+![alt text](image-1.png)
+
 If `model.pkl` is present the dashboard will load it and use it for inference. If it's missing the dashboard will train a temporary model (for demo only) and you'll see a warning prompting you to create `model.pkl`.
 
 Hosting
@@ -33,3 +35,5 @@ Hosting
 Notes
 - Do **not** commit large datasets to the repo; for `model.pkl` it's ok for small models but consider using object storage for larger artifacts.
 - Add deployment manifests or a simple download step to fetch `model.pkl` from S3/GCP storage if you want to avoid checking the pickle into Git.
+
+![alt text](image-2.png)
