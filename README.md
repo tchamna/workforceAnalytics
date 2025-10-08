@@ -1,8 +1,15 @@
-# HR Attrition Dashboard
 
-This workspace contains a Streamlit dashboard for HR attrition.
 
-Local quick start (PowerShell):
+# 💼 HR Attrition Dashboard
+
+Interactive analytics and explainability for employee attrition using Streamlit.
+
+🔗 **Live demo:** [tchamna-humanresource-analytics.streamlit.app](https://tchamna-humanresource-analytics.streamlit.app/)
+
+---
+
+![alt text](image.png)
+## 🚀 Quick Start (Local)
 
 ```powershell
 pip install -r requirements.txt
